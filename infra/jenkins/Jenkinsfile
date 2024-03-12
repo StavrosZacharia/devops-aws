@@ -1,0 +1,75 @@
+properties([
+    // buildDiscarder(logRotator( numToKeepStr: '70')),
+    disableConcurrentBuilds(),
+    parameters([
+        choice(name: 'Choice',choices: ["apply", ""],description: ''),
+    ])
+])
+
+def APPLICATION = "nginx"
+def ENVIRONMENT = "dev"
+def CHECKOUT_REPO = "https://gitlab.com/cloud-devops-infra/thesis.git"
+
+REGION = "eu-central-1"
+credentials = "22193aba-c47d-472b-b166-70a4037f37ed"
+
+node("master"){
+
+    try {
+        stage("Checkout"){
+            STAGE = env.STAGE_NAME
+            sh """ rm -rf *"""
+            git branch: branch, credentialsId: '3b8ae5f6-eb36-4083-80d6-3660ffb4a376', url: "${CHECKOUT_REPO}"
+        }
+
+        stage("Check AWS State"){
+            STAGE = env.STAGE_NAME
+            
+            withCredentials([aws(accessKeyVariable:'AWS_ACCESS_KEY_ID', credentialsId: credentials, secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                sh """ terraform init && terraform plan """
+            }
+        }
+
+        stage("Terraform AWS"){
+            STAGE = env.STAGE_NAME
+            withCredentials([aws(accessKeyVariable:'AWS_ACCESS_KEY_ID', credentialsId: credentials, secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                sh """ terraform ${Choice} --auto-approve """
+            }
+        }
+
+        stage("Upload AWS state file"){
+            STAGE = env.STAGE_NAME
+
+            withCredentials([gitUsernamePassword(credentialsId: '3b8ae5f6-eb36-4083-80d6-3660ffb4a376', gitToolName: 'Default')]) {
+                sh """ 
+                    git add -A
+                    git diff-index --quiet HEAD || git commit -m "Jenkins commit stage:$env.STAGE_NAME $JOB_BASE_NAME-$BUILD_ID" -m '$BUILD_TRIGGER_BY'
+                    git push --set-upstream origin $branch
+                """
+            }
+        }
+        
+        currentBuild.result = "SUCCESS"
+
+    }catch (Exception e) {
+        println "Failed at Stage:$STAGE"
+        echo e.getMessage()
+        currentBuild.result = "FAILURE"
+
+    }finally{
+        Slack_Notify(slack_channel)
+    }
+}
+
+def Slack_Notify(slack_channel){
+
+    if ( currentBuild.result == "SUCCESS" ) {
+        slackSend (color: "good", channel: slack_channel, message: "*${currentBuild.result}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} is successful. \n More info at: ${env.BUILD_URL}")
+    }else if( currentBuild.result == "FAILURE" ) { 
+        slackSend (color: "danger", channel: slack_channel, message: "*${currentBuild.result}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} has failed at stage:$STAGE. \n More info at: ${env.BUILD_URL}")        
+    }else if( currentBuild.result == "UNSTABLE" ) { 
+        slackSend (color: "warning", channel: slack_channel, message: "*${currentBuild.result}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} is unstable.) \n More info at: ${env.BUILD_URL}")
+    }else {
+        slackSend (color: "danger", channel: slack_channel, message: "*${currentBuild.result}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} it's unclear. \n More info at: ${env.BUILD_URL}" )   
+    }
+}

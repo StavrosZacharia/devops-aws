@@ -1,0 +1,9 @@
+environment               = "dev"
+vpc_cidr_block            = "10.1.0.0/16"
+public_subnets            = ["10.1.0.0/18", "10.1.64.0/18"]
+private_subnets           = ["10.1.128.0/18", "10.1.192.0/18"]
+region                    = "eu-central-1"
+eks_version               = "1.27"
+workernodes_instance_type = "t3.medium"
+workernodes_disk_size     = "70"
+ebs_csi_addon_version     = "v1.22.0-eksbuild.2"
