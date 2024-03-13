@@ -2,13 +2,13 @@ properties([
     // buildDiscarder(logRotator( numToKeepStr: '70')),
     disableConcurrentBuilds(),
     parameters([
-        choice(name: 'Choice',choices: ["apply", ""],description: ''),
+        choice(name: 'Choice',choices: ["apply", "destroy"],description: ''),
     ])
 ])
 
 def APPLICATION = "nginx"
 def ENVIRONMENT = "dev"
-def CHECKOUT_REPO = "https://gitlab.com/cloud-devops-infra/thesis.git"
+def CHECKOUT_REPO = "https://github.com/StavrosZacharia/devops-aws.git"
 
 REGION = "eu-central-1"
 credentials = "22193aba-c47d-472b-b166-70a4037f37ed"
@@ -19,7 +19,7 @@ node("master"){
         stage("Checkout"){
             STAGE = env.STAGE_NAME
             sh """ rm -rf *"""
-            git branch: branch, credentialsId: '3b8ae5f6-eb36-4083-80d6-3660ffb4a376', url: "${CHECKOUT_REPO}"
+            git branch: branch, credentialsId: '2b001878-b483-4075-b882-df99aba4f688', url: "${CHECKOUT_REPO}"
         }
 
         stage("Check AWS State"){
@@ -43,8 +43,8 @@ node("master"){
             withCredentials([gitUsernamePassword(credentialsId: '3b8ae5f6-eb36-4083-80d6-3660ffb4a376', gitToolName: 'Default')]) {
                 sh """ 
                     git add -A
-                    git diff-index --quiet HEAD || git commit -m "Jenkins commit stage:$env.STAGE_NAME $JOB_BASE_NAME-$BUILD_ID" -m '$BUILD_TRIGGER_BY'
-                    git push --set-upstream origin $branch
+                    git diff-index --quiet HEAD || git commit -m "Jenkins commit stage"
+                    git push --set-upstream origin master
                 """
             }
         }
@@ -56,20 +56,5 @@ node("master"){
         echo e.getMessage()
         currentBuild.result = "FAILURE"
 
-    }finally{
-        Slack_Notify(slack_channel)
-    }
-}
-
-def Slack_Notify(slack_channel){
-
-    if ( currentBuild.result == "SUCCESS" ) {
-        slackSend (color: "good", channel: slack_channel, message: "*${currentBuild.result}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} is successful. \n More info at: ${env.BUILD_URL}")
-    }else if( currentBuild.result == "FAILURE" ) { 
-        slackSend (color: "danger", channel: slack_channel, message: "*${currentBuild.result}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} has failed at stage:$STAGE. \n More info at: ${env.BUILD_URL}")        
-    }else if( currentBuild.result == "UNSTABLE" ) { 
-        slackSend (color: "warning", channel: slack_channel, message: "*${currentBuild.result}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} is unstable.) \n More info at: ${env.BUILD_URL}")
-    }else {
-        slackSend (color: "danger", channel: slack_channel, message: "*${currentBuild.result}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} it's unclear. \n More info at: ${env.BUILD_URL}" )   
     }
 }
