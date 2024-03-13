@@ -31,8 +31,9 @@ node(""){
                 sh 'sudo mv terraform /usr/local/bin/terraform'
                 sh 'terraform version'
                 sh """ ls """
+                sh """cd infra"""
                 // sh """ terraform init && terraform plan """
-                // sh """ terraform ${Choice} --auto-approve """
+                sh """ terraform ${Choice} --auto-approve """
         }
 
         // stage("Upload AWS state file"){
