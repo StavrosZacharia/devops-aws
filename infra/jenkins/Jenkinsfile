@@ -10,8 +10,8 @@ def APPLICATION = "nginx"
 def ENVIRONMENT = "dev"
 def CHECKOUT_REPO = "https://github.com/StavrosZacharia/devops-aws.git"
 
-REGION = "eu-central-1"
-credentials = "22193aba-c47d-472b-b166-70a4037f37ed"
+def REGION = "eu-central-1"
+def credentials = "22193aba-c47d-472b-b166-70a4037f37ed	"
 
 node(""){
 
