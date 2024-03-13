@@ -6,7 +6,7 @@ def deploy = true
 def APPLICATION = "nginx"
 def ENVIRONMENT = "dev"
 def CHECKOUT_REPO = "https://github.com/StavrosZacharia/devops-aws.git"
-def EVR_REPO = "528614166014.dkr.ecr.us-east-1.amazonaws.com"
+def ECR_REPO = "528614166014.dkr.ecr.us-east-1.amazonaws.com"
 def REGION = "us-east-1"
 credentials = "c1e766bb-263b-4128-9d79-120d3d2d1531"
 
