@@ -73,26 +73,6 @@ resource "aws_iam_policy" "ecs_policy" {
   })
 }
 
-resource "aws_iam_policy" "eks_services_policy" {
-  name        = "AmazonEKSServicesPolicy"
-  description = "Provides necessary permissions for Amazon EKS services"
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect   = "Allow",
-        Action   = [
-          "eks:DescribeCluster",
-          "eks:ListClusters",
-          "eks:AccessKubernetesApi",
-        ],
-        Resource = "*",
-      },
-    ],
-  })
-}
-
 resource "aws_iam_policy_attachment" "ecs_policy_attachment" {
   name       = "ecs_policy_attachment"
   roles      = [aws_iam_role.ecs_execution_role.name]
