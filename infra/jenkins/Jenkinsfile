@@ -31,8 +31,8 @@ node(""){
                 sh 'sudo mv terraform /usr/local/bin/terraform'
                 sh 'terraform version'
                 sh """ ls """
-                sh """cd infra"""
-                sh """ ls && \
+                sh """cd infra &&\
+                    ls && \
                     terraform init && terraform plan """
                 // sh """ terraform ${Choice} --auto-approve """
         }
