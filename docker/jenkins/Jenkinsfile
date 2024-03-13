@@ -12,7 +12,7 @@ credentials = "c1e766bb-263b-4128-9d79-120d3d2d1531"
 
 
 
-node("nodejs"){
+node(""){
 
     try {
 
