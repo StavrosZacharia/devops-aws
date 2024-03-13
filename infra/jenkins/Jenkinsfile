@@ -28,23 +28,24 @@ node(""){
                 sh "wget https://releases.hashicorp.com/terraform/${terraformVersion}/terraform_${terraformVersion}_linux_amd64.zip"
                 sh "unzip -o terraform_${terraformVersion}_linux_amd64.zip"
                 sh 'chmod +x terraform'
-                sh 'mv terraform /usr/local/bin/terraform'
+                sh 'sudo mv terraform /usr/local/bin/terraform'
                 sh 'terraform version'
-                sh """ terraform init && terraform plan """
-                sh """ terraform ${Choice} --auto-approve """
+                sh """ ls """
+                // sh """ terraform init && terraform plan """
+                // sh """ terraform ${Choice} --auto-approve """
         }
 
-        stage("Upload AWS state file"){
-            STAGE = env.STAGE_NAME
+        // stage("Upload AWS state file"){
+        //     STAGE = env.STAGE_NAME
 
-            withCredentials([gitUsernamePassword(credentialsId: '3b8ae5f6-eb36-4083-80d6-3660ffb4a376', gitToolName: 'Default')]) {
-                sh """ 
-                    git add -A
-                    git diff-index --quiet HEAD || git commit -m "Jenkins commit stage"
-                    git push --set-upstream origin master
-                """
-            }
-        }
+        //     withCredentials([gitUsernamePassword(credentialsId: '3b8ae5f6-eb36-4083-80d6-3660ffb4a376', gitToolName: 'Default')]) {
+        //         sh """ 
+        //             git add -A
+        //             git diff-index --quiet HEAD || git commit -m "Jenkins commit stage"
+        //             git push --set-upstream origin master
+        //         """
+        //     }
+        // }
         
         currentBuild.result = "SUCCESS"
 
