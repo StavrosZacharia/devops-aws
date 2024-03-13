@@ -107,7 +107,7 @@ resource "aws_iam_policy_attachment" "eks_cluster_policy_attachment" {
 
 resource "aws_iam_policy_attachment" "eks_service_policy_attachment" {
   name       = "eks_policy_attachment"
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicesPolicy"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
   roles      = [aws_iam_role.eks_execution_role.name]
 }
 
