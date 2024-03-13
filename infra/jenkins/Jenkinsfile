@@ -13,7 +13,7 @@ def CHECKOUT_REPO = "https://github.com/StavrosZacharia/devops-aws.git"
 REGION = "eu-central-1"
 credentials = "22193aba-c47d-472b-b166-70a4037f37ed"
 
-node("master"){
+node(""){
 
     try {
         stage("Checkout"){
