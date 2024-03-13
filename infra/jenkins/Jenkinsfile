@@ -40,7 +40,7 @@ node(""){
 
         stage("Apply AWS changes"){
             withCredentials([aws(accessKeyVariable:'AWS_ACCESS_KEY_ID', credentialsId: credentials, secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]){
-                sh """ terraform ${Choice} --auto-approve """
+                sh """ cd infra && terraform ${Choice} --auto-approve """
             }
         }
 
