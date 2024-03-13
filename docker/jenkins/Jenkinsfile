@@ -28,7 +28,7 @@ node(""){
 
             stage("Docker"){
                 STAGE = env.STAGE_NAME
-                sh""" docker build -t $ECR_REPO/$APPLICATION-image:latest -f Dockerfile . """
+                sh""" docker build -t $ECR_REPO/$APPLICATION-image:latest -f Dockerfile ./docker/ """
             }
 
             stage("Upload to ECR"){
