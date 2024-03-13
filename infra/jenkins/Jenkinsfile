@@ -11,7 +11,7 @@ def ENVIRONMENT = "dev"
 def CHECKOUT_REPO = "https://github.com/StavrosZacharia/devops-aws.git"
 
 def REGION = "eu-central-1"
-def credentials = "22193aba-c47d-472b-b166-70a4037f37ed	"
+def credentials = "22193aba-c47d-472b-b166-70a4037f37ed"
 
 node(""){
 
@@ -22,19 +22,16 @@ node(""){
             git branch: 'master', credentialsId: '2b001878-b483-4075-b882-df99aba4f688', url: "${CHECKOUT_REPO}"
         }
 
-        stage("Check AWS State"){
+        stage("Install terraform and plan"){
             STAGE = env.STAGE_NAME
-            
-            withCredentials([aws(accessKeyVariable:'AWS_ACCESS_KEY_ID', credentialsId: credentials, secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                def terraformVersion = '1.3.1'
+                sh "wget https://releases.hashicorp.com/terraform/${terraformVersion}/terraform_${terraformVersion}_linux_amd64.zip"
+                sh "unzip -o terraform_${terraformVersion}_linux_amd64.zip"
+                sh 'chmod +x terraform'
+                sh 'mv terraform /usr/local/bin/terraform'
+                sh 'terraform version'
                 sh """ terraform init && terraform plan """
-            }
-        }
-
-        stage("Terraform AWS"){
-            STAGE = env.STAGE_NAME
-            withCredentials([aws(accessKeyVariable:'AWS_ACCESS_KEY_ID', credentialsId: credentials, secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                 sh """ terraform ${Choice} --auto-approve """
-            }
         }
 
         stage("Upload AWS state file"){
