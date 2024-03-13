@@ -32,7 +32,7 @@ node(""){
                 sh 'terraform version'
                 sh """ ls """
                 sh """cd infra"""
-                sh """ ls \
+                sh """ ls && \
                     terraform init && terraform plan """
                 // sh """ terraform ${Choice} --auto-approve """
         }
