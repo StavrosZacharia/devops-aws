@@ -11,7 +11,7 @@ def ENVIRONMENT = "dev"
 def CHECKOUT_REPO = "https://github.com/StavrosZacharia/devops-aws.git"
 
 def REGION = "eu-central-1"
-def credentials = "22193aba-c47d-472b-b166-70a4037f37ed"
+credentials = "c1e766bb-263b-4128-9d79-120d3d2d1531"
 
 node(""){
 
@@ -31,10 +31,12 @@ node(""){
                 sh 'sudo mv terraform /usr/local/bin/terraform'
                 sh 'terraform version'
                 sh """ ls """
-                sh """cd infra &&\
+                withCredentials([aws(accessKeyVariable:'AWS_ACCESS_KEY_ID', credentialsId: credentials, secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]){
+                sh """cd infra && \
                     ls && \
                     terraform init && terraform plan """
                 // sh """ terraform ${Choice} --auto-approve """
+                }
         }
 
         // stage("Upload AWS state file"){
