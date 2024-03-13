@@ -45,19 +45,19 @@ node(""){
             }
         }
 
-        stage("Upload AWS state file"){
-            STAGE = env.STAGE_NAME
+        // stage("Upload AWS state file"){
+        //     STAGE = env.STAGE_NAME
 
-            withCredentials([gitUsernamePassword(credentialsId: '2b001878-b483-4075-b882-df99aba4f688', gitToolName: 'Default')]) {
-                sh """ 
-                    git config --global user.name "StavrosZacharia"
-                    git config --global user.email "stavros.zacharia@hotmail.com"
-                    git add -A
-                    git diff-index --quiet HEAD || git commit -m "Jenkins commit stage"
-                    git push --set-upstream origin master
-                """
-            }
-        }
+        //     withCredentials([gitUsernamePassword(credentialsId: '2b001878-b483-4075-b882-df99aba4f688', gitToolName: 'Default')]) {
+        //         sh """ 
+        //             git config --global user.name "StavrosZacharia"
+        //             git config --global user.email "stavros.zacharia@hotmail.com"
+        //             git add -A
+        //             git diff-index --quiet HEAD || git commit -m "Jenkins commit stage"
+        //             git push --set-upstream origin master
+        //         """
+        //     }
+        // }
         
         currentBuild.result = "SUCCESS"
 
