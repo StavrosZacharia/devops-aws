@@ -51,6 +51,8 @@ node(""){
                 sh """ 
                     git add -A
                     git diff-index --quiet HEAD || git commit -m "Jenkins commit stage"
+                    git config --global user.name "StavrosZacharia"
+                    git config --global user.email "stavros.zacharia@hotmail.com"
                     git push --set-upstream origin master
                 """
             }
