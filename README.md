@@ -66,7 +66,7 @@ Install dependencies locally:
 
 
 
-## These dependencies need to be installed on the docker container created above
+## These dependencies need to be installed on both local as well as the docker container created above
 
 
 **AWS CLI**: [Installation Guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
