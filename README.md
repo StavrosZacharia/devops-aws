@@ -50,13 +50,13 @@ Trigger the Jenkins pipeline to automate the deployment process.
 ## Usage
 
 
-Clone the repository:
+### Clone the repository:
 
 
 ```git clone https://github.com/StavrosZacharia/devops-aws.git```
 
 
-Install dependencies locally:
+### Install dependencies locally:
 
 
 **Docker**: [Installation Guide](https://docs.docker.com/engine/install/)
@@ -66,7 +66,7 @@ Install dependencies locally:
 
 
 
-## These dependencies need to be installed on both local as well as the docker container created above
+### These dependencies need to be installed on both local as well as the docker container created above
 
 
 **AWS CLI**: [Installation Guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
@@ -74,6 +74,8 @@ Install dependencies locally:
 
 **Kubernetes**: [Installation Guide](https://kubernetes.io/docs/setup/)
 
+
+### This dependency only needs to be installed on the docker container
 
 **ArgoCD**: [Installation Guide](https://argo-cd.readthedocs.io/en/stable/getting_started/)
 
