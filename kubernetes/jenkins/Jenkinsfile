@@ -4,8 +4,8 @@ def deploy
 deploy = true
 println "Deploying for staging..."
 EKS_BRANCH = "development"
-EKS_REPO = "https://github.com/bdswiss/devops-kubernetes.git"
-credentials = "d1bb50ff-31cc-4223-bd0b-9698426ac403"
+// EKS_REPO = "https://github.com/bdswiss/devops-kubernetes.git" 
+credentials = "c1e766bb-263b-4128-9d79-120d3d2d1531"
 
 
 node("master"){
@@ -16,7 +16,7 @@ node("master"){
             
             stage("Checkout"){
                 STAGE = env.STAGE_NAME
-                withCredentials([gitUsernamePassword(credentialsId: '3b8ae5f6-eb36-4083-80d6-3660ffb4a376', gitToolName: 'Default')]) {
+                withCredentials([gitUsernamePassword(credentialsId: '2b001878-b483-4075-b882-df99aba4f688', gitToolName: 'Default')]) {
                     sh"""
                         rm -rf * || true
                         git config --global user.email "development@bdswiss.com"
@@ -88,7 +88,7 @@ node("master"){
         if (STAGE == 'Deploy to EKS' && currentBuild.result == "FAILURE"){
 
             print ('Rollback....')
-            withCredentials([gitUsernamePassword(credentialsId: '3b8ae5f6-eb36-4083-80d6-3660ffb4a376', gitToolName: 'Default')]) {
+            withCredentials([gitUsernamePassword(credentialsId: '2b001878-b483-4075-b882-df99aba4f688', gitToolName: 'Default')]) {
                     
                 sh """ 
                     cd ./devops-kubernetes/bdswiss/applications/$APPLICATION
@@ -112,17 +112,6 @@ node("master"){
                     kubectl -n argocd --kubeconfig ~/.kube/$ENVIRONMENT-eks exec -ti \$ARGO_SERVER -- argocd login localhost:8080 --insecure --username admin --password \$ARGO_PASSWORD
                     kubectl -n argocd --kubeconfig ~/.kube/$ENVIRONMENT-eks exec -ti \$ARGO_SERVER -- bash -c "argocd app list && argocd app sync $APPLICATION && argocd app list || true"
                 """
-
-                if(APPLICATION.contains("website")){
-                    sleep 100
-                }
-
-                try{
-                    sh""" kubectl get pods -n $namespace | grep Error | awk '{print \$1}' | xargs kubectl delete pod -n $namespace --kubeconfig ~/.kube/$ENVIRONMENT-eks || true"""
-                    sh""" kubectl -n $namespace wait --for=condition=ready pod -l version=$APPLICATION-$VERSION --timeout=80s --kubeconfig ~/.kube/$ENVIRONMENT-eks"""
-                }catch(Exception wait){
-                    sh""" kubectl -n $namespace wait --for=condition=ready pod -l version=$APPLICATION-$VERSION --timeout=80s --kubeconfig ~/.kube/$ENVIRONMENT-eks"""
-                }
             }
         }
 
