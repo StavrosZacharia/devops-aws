@@ -15,9 +15,14 @@ jobs:
         with:
           ref: master
 
+      - name: Set up environment variables
+        run: |
+          echo "APPLICATION=nginx" >> $GITHUB_ENV
+
       - name: Build and push Docker image
         run: |
           cd docker  # Change directory to the folder containing the Dockerfile
           docker build -t ${{ secrets.ECR_REPO }}/$APPLICATION-image:latest -f Dockerfile .
+          docker tag ${}
           echo "${{ secrets.AWS_ACCESS_KEY_ID }}" | docker login -u AWS --password-stdin https://${{ secrets.ECR_REPO }}
           docker push ${{ secrets.ECR_REPO }}/$APPLICATION-image:latest

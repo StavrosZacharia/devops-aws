@@ -535,7 +535,7 @@ resource "aws_launch_configuration" "eks_config" {
 }
 
 resource "aws_autoscaling_group" "eks_asg" {
-  desired_capacity     = 2
+  desired_capacity     = 1
   launch_configuration = aws_launch_configuration.eks_config.id
   max_size             = 2
   min_size             = 1
