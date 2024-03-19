@@ -1,0 +1,23 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: master
+
+      - name: Build and push Docker image
+        run: |
+          cd docker  # Change directory to the folder containing the Dockerfile
+          docker build -t ${{ secrets.ECR_REPO }}/$APPLICATION-image:latest -f Dockerfile .
+          echo "${{ secrets.AWS_ACCESS_KEY_ID }}" | docker login -u AWS --password-stdin https://${{ secrets.ECR_REPO }}
+          docker push ${{ secrets.ECR_REPO }}/$APPLICATION-image:latest
