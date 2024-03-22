@@ -211,11 +211,11 @@ Note: I could provide my personal credentials through an Access Key for AWS, but
 
 13. Insert into this file the Access key and Secret access key in this format:
 
+   ```
    [default]
-
    aws_access_key_id = AccessKeyValue
-   
    aws_secret_access_key = SecretAccessKeyValue
+   ```
 
 14. Save the file.
 
