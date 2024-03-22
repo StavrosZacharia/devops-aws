@@ -205,6 +205,7 @@ Note: I could provide my personal credentials through an Access Key for AWS, but
 
 10. Copy and save the values of the "Access key" and the "Secret access key".
 
+<<<<<<< HEAD
 11. Go to the search bar on the top of the page, type "S3" and click the first option.
 
 12. Select "Create bucket" and give it a name (the name must be unique globally), scroll down and click "Create bucket".
@@ -216,6 +217,13 @@ Note: I could provide my personal credentials through an Access Key for AWS, but
 15. Create (if it does not already exist) a file named "credentials" with no extension.
 
 16. Insert into this file the Access key and Secret access key in this format:
+=======
+11. On your local machine, navigate to the home directory and open the folder ".aws".
+
+12. Create (if it does not already exist) a file named "credentials" with no extension.
+
+13. Insert into this file the Access key and Secret access key in this format:
+>>>>>>> 5df8616180f02e199855a624a40c60ac5d596f67
 
    ```
    [default]
@@ -223,6 +231,7 @@ Note: I could provide my personal credentials through an Access Key for AWS, but
    aws_secret_access_key = SecretAccessKeyValue
    ```
 
+<<<<<<< HEAD
 17. Save the file.
 
 18. Now, navigate to the directory where you cloned this project.
@@ -232,6 +241,9 @@ Note: I could provide my personal credentials through an Access Key for AWS, but
 20. Replace 'bucket         = "terraform-thesis-state"' with 'bucket         = "nameOfTheBucketCreatedAbove"'.
 
 21. Save the file.
+=======
+14. Save the file.
+>>>>>>> 5df8616180f02e199855a624a40c60ac5d596f67
 
 ### Local Terraform
 
