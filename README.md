@@ -50,11 +50,6 @@ Trigger the Jenkins pipeline to automate the deployment process.
 ### Clone the repository:
 
 
-```bash
-git clone https://github.com/StavrosZacharia/devops-aws.git
-```
-
-
 ### Install dependencies locally:
 #### NOTE THAT THE DEPENDENCIES ARE LISTED IN THE REQUIRED ORDER TO BE INSTALLED
 
@@ -233,6 +228,50 @@ Note: I could provide my personal credentials through an Access Key for AWS, but
 
 21. Save the file.
 
+
+### Github
+
+1. Create an account on [GitHub](https://github.com/join) if you do not already have one.
+
+2. Create a repository for this project.
+
+3. On your local machine, run these commands with your information:
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "youremail@example.com"
+
+```
+
+```bash
+git clone https://github.com/StavrosZacharia/devops-aws.git
+```
+
+```bash
+cd devops-aws
+```
+
+```bash
+git init
+```
+
+```bash
+git remote add origin <your_repository_link.git>
+```
+
+```bash
+git add .
+```
+
+```bash
+git commit -m "Initial commit"
+```
+
+```bash
+git push origin master
+```
+
+
 ### Local Terraform
 
 
@@ -244,6 +283,38 @@ Note: I could provide my personal credentials through an Access Key for AWS, but
 
 2. Run the command ```terraform init```
 
+### Jenkins
+
+
+After following the Jenkins guide and installing the plugins listed above, navigate to the Jenkins [dashboard](http://localhost:8080/).
+
+#### Setting up the credentials
+
+
+1. On the menu on the left, click "Manage Jenkins".
+
+2. Scroll down and click on "Credentials".
+
+3. Under "Stores scoped to Jenkins" click "System".
+
+4. Click "Global credentials" and then click "Add credentials".
+
+5. Under "Kind" select "AWS credentials" and leave the "Scope" as it is.
+
+6. The project has been configured with "thesis-project" as its ID, so insert that in ID.
+
+7. Description can be left blank, and then go ahead and insert the AWS Access Key from earlier in the Access Key ID field and the secret access key in Secret Access Key, and click "Create".
+
+8. Click "Add Credentials" again, and this time select "Username with password" under "Kind" and leave the scope unchanged.
+
+9. Insert your Git username and passwords in the respective fields, and in "ID" insert "devops-jenkins" as this is the configuration this project has. In description, type "GitHub credentials".
+
+
+#### Setting up the pipeline
+
+1. Navigate to the Jenkins [Dashboard](localhost:8080) Click on "New Item".
+
+2. Enter a name, in this case something like "TERRAFORM_AWS_INFRASTRUCTURE", and click on "Pipeline"
 
 ## Acknowledgments
 
