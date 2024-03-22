@@ -1,17 +1,9 @@
-properties([
-    // buildDiscarder(logRotator( numToKeepStr: '70')),
-    disableConcurrentBuilds(),
-    parameters([
-        choice(name: 'Choice',choices: ["apply", "destroy"],description: ''),
-    ])
-])
-
 def APPLICATION = "nginx"
 def ENVIRONMENT = "dev"
 def CHECKOUT_REPO = "https://github.com/StavrosZacharia/devops-aws.git"
 
 def REGION = "eu-central-1"
-credentials = "c1e766bb-263b-4128-9d79-120d3d2d1531"
+credentials = "thesis-project"
 
 node(""){
 
@@ -19,7 +11,7 @@ node(""){
         stage("Checkout"){
             STAGE = env.STAGE_NAME
             sh """ rm -rf *"""
-            git branch: 'master', credentialsId: '2b001878-b483-4075-b882-df99aba4f688', url: "${CHECKOUT_REPO}"
+            git branch: 'master', credentialsId: 'devops-jenkins', url: "${CHECKOUT_REPO}"
         }
 
         stage("Install terraform and plan"){
@@ -41,24 +33,9 @@ node(""){
 
         stage("Apply AWS changes"){
             withCredentials([aws(accessKeyVariable:'AWS_ACCESS_KEY_ID', credentialsId: credentials, secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]){
-                sh """ cd infra && terraform ${Choice} --auto-approve """
+                sh """ cd infra && terraform apply --auto-approve """
             }
         }
-
-        // stage("Upload AWS state file"){
-        //     STAGE = env.STAGE_NAME
-
-        //     withCredentials([gitUsernamePassword(credentialsId: '2b001878-b483-4075-b882-df99aba4f688', gitToolName: 'Default')]) {
-        //         sh """ 
-        //             git config --global user.name "StavrosZacharia"
-        //             git config --global user.email "stavros.zacharia@hotmail.com"
-        //             git add -A
-        //             git diff-index --quiet HEAD || git commit -m "Jenkins commit stage"
-        //             git push --set-upstream origin master
-        //         """
-        //     }
-        // }
-        
         currentBuild.result = "SUCCESS"
 
     }catch (Exception e) {

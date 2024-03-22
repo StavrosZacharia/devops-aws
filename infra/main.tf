@@ -1,6 +1,4 @@
-//module vpc, lb_stickiness, 
-// role permissions: ecsTaskExecution, WriteLogs
-
+//Create execution role for ECS
 resource "aws_iam_role" "ecs_execution_role" {
   name = "ecs_execution_role"
 
@@ -18,6 +16,7 @@ resource "aws_iam_role" "ecs_execution_role" {
   })
 }
 
+//Create execution role for EKS
 resource "aws_iam_role" "eks_execution_role" {
   name = "eks_execution_role"
 
@@ -37,12 +36,13 @@ resource "aws_iam_role" "eks_execution_role" {
 POLICY
 }
 
+
 variable "cluster-name" {
   default = "terraform-eks"
   type    = string
 }
 
-
+//Create policy for ECS
 resource "aws_iam_policy" "ecs_policy" {
   name = "ecs_policy"
 
@@ -91,6 +91,7 @@ resource "aws_iam_policy_attachment" "eks_service_policy_attachment" {
   roles      = [aws_iam_role.eks_execution_role.name]
 }
 
+//Create Virtual Private Cloud for the infrastructure
 resource "aws_vpc" "ecs_vpc" {
   cidr_block = "10.0.0.0/16"
 
@@ -99,6 +100,7 @@ resource "aws_vpc" "ecs_vpc" {
   }
 }
 
+//Create the security group for ECS
 resource "aws_security_group" "ecs_security_group" {
   name        = "ecs-security-group"
   description = "Security group for ECS operations"
@@ -123,6 +125,8 @@ resource "aws_security_group" "ecs_security_group" {
   }
 }
 
+
+//Create security group for EKS
 resource "aws_security_group" "eks_security_group" {
   name        = "eks_security_group"
   description = "Cluster communication with worker nodes"
@@ -189,6 +193,7 @@ resource "aws_subnet" "private_subnet_2" {
   }
 }
 
+//Create gateway to give internet access
 resource "aws_internet_gateway" "ecs_internet_gateway" {
   vpc_id = aws_vpc.ecs_vpc.id
 }
@@ -219,7 +224,7 @@ resource "aws_route" "internet_gateway_route" {
   gateway_id             = aws_internet_gateway.ecs_internet_gateway.id
 }
 
-
+//Create ECS cluster
 resource "aws_ecs_cluster" "ecs_cluster" {
   name = "test-ecs-cluster"
 
@@ -228,6 +233,7 @@ resource "aws_ecs_cluster" "ecs_cluster" {
   }
 }
 
+//Data for the image to be used
 data "aws_ami" "ubuntu" {
   most_recent = true
 
@@ -242,6 +248,7 @@ data "aws_ami" "ubuntu" {
   }
 }
 
+
 resource "aws_launch_configuration" "ecs_launch_config" {
   name            = "ecs-launch-config"
   image_id        = data.aws_ami.ubuntu.id
@@ -249,7 +256,7 @@ resource "aws_launch_configuration" "ecs_launch_config" {
   security_groups = [aws_security_group.ecs_security_group.id]
 }
 
-
+//Created the task definition for ECS
 resource "aws_ecs_task_definition" "sample_task" {
   family             = "sample-nginx-task"
   cpu                = "256"
@@ -330,7 +337,7 @@ resource "aws_lb_listener" "aws_lb_listener" {
 # }
 
 
-
+//Create a service inside the ECS cluster
 resource "aws_ecs_service" "sample_service" {
   name                 = "sample-nginx-service"
   cluster              = aws_ecs_cluster.ecs_cluster.id
@@ -354,6 +361,8 @@ resource "aws_ecs_service" "sample_service" {
   }
 }
 
+
+//Create the Elastic Kubernetes Service cluster
 resource "aws_eks_cluster" "cluster" {
   name     = var.cluster-name
   role_arn = aws_iam_role.eks_execution_role.arn
@@ -404,6 +413,8 @@ output "kubeconfig" {
   value = local.kubeconfig
 }
 
+
+//Create the role for EKS workers
 resource "aws_iam_role" "worker" {
   name = "terraform-eks-worker"
 
@@ -524,7 +535,7 @@ resource "aws_launch_configuration" "eks_config" {
   associate_public_ip_address = true
   iam_instance_profile        = aws_iam_instance_profile.worker.name
   image_id                    = data.aws_ami.eks-worker.id
-  instance_type               = "t2.micro"
+  instance_type               = "t2.micro" //Chose the smallest instance type for cost efficiency
   name_prefix                 = "terraform-eks"
   security_groups             = ["${aws_security_group.worker.id}"]
   user_data_base64            = base64encode(local.worker-userdata)
@@ -535,10 +546,10 @@ resource "aws_launch_configuration" "eks_config" {
 }
 
 resource "aws_autoscaling_group" "eks_asg" {
-  desired_capacity     = 1
+  desired_capacity     = 1 //Usually higher than 1, this defines how many EC2 instances will be created for this cluster
   launch_configuration = aws_launch_configuration.eks_config.id
-  max_size             = 2
-  min_size             = 1
+  max_size             = 2 //Allow for multiple instances at the same time if needed
+  min_size             = 1 //Do not allow downtime, even on updates
   name                 = "terraform-eks"
   vpc_zone_identifier  = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id, aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
 
@@ -555,6 +566,7 @@ resource "aws_autoscaling_group" "eks_asg" {
   }
 }
 
+//Create the ECR repository
 resource "aws_ecr_repository" "nginx_repository" {
   name = "nginx-image"
   image_scanning_configuration {
