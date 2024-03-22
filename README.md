@@ -316,6 +316,74 @@ After following the Jenkins guide and installing the plugins listed above, navig
 
 2. Enter a name, in this case something like "TERRAFORM_AWS_INFRASTRUCTURE", and click on "Pipeline"
 
+3. In the "Build Triggers" section, tick "Poll SCM" and then insert the timeframe at which you want the pipeline to check for changes on SCM (e.g. "*/2 * * * *" will check for changes every 2 minutes).
+
+4. Scroll all the way to the bottom at the "Pipeline section" and in "Definition" select "Pipeline script from SCM"
+
+5. In "Repositories" inside "Repository URL" insert the link to your github repository, and in Credentials open the drop down menu and select the credentials you created earlier. (There is a bug when sometimes it does not show the credentials, in this case click the "Add" button then "Jenkins" and a popup will appear. After that, repeat the process to create your git credentials).
+
+6. In "Branches to build" and "Branch specifier" insert the branch where you pushed this project into.
+
+7. In "Script Path", type "infra/jenkins/Jenkinsfile" and click "Save".
+
+8. Click on "Build" on the left menu to run the build and wait for it to be complete.
+
+### Docker
+
+The process of Docker should be automated as well, but due to time constraints and unexpected routing issues I opted to execute it locally instead.
+
+1. In the meantime open your web browser, go to AWS (if you have been logged out you need to [login](https://aws.amazon.com/marketplace/management/signin) again, click on your name on the top right corner and select "Your AWS Console").
+
+2. Type "ECR" on the top search bar, and click on the first link.
+
+3. You should be able to see a "nginx-image" repository, copy its URI. (if you are certain the build ran and completed and you still do not see the repository, check the region in the upper right corner. The region needs to be set to "US East (N. Virginia) us-east-1").
+
+4. On your local machine, navigate to the directory you cloned the project.
+
+5. Run the following commands:
+
+```bash
+docker build -t nginx-image:1 .
+```
+
+```bash
+docker tag nginx-image:1 <YourURI>
+:1
+```
+
+```bash
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <YourURI>
+```
+
+```bash
+docker push <YourURI>:1
+```
+
+This should create image version 1 under the "nginx-image" repository on ECR.
+
+### Kubernetes
+
+1. Open your terminal and run the following command:
+
+```bash
+aws eks update-kubeconfig --region us-east-1 --name terraform-eks
+```
+
+2. Navigate to your home directory then open the folder ".kube", if there is no file named "config", copy the downloaded file from the previous command inside. If it already is there, then disregard this step.
+
+3. Run the following commands:
+
+```bash
+kubectl apply -f .\nginx-deployment.yaml
+```
+
+```bash
+kubectl apply -f .\nginx-service.yaml
+```
+
+This should deploy  the "nginx-image:1" from ECS to EKS. 
+
+
 ## Acknowledgments
 
 
