@@ -509,7 +509,7 @@ data "aws_ami" "eks-worker" {
   }
 
   most_recent = true
-  owners      = ["602401143452"] # Amazon EKS AMI Account ID
+  owners      = ["self"] # Amazon EKS AMI Account ID
 }
 
 locals {
@@ -564,4 +564,16 @@ resource "aws_ecr_repository" "nginx_repository" {
 
 output "ecr_repository_url" {
   value = aws_ecr_repository.nginx_repository.repository_url
+}
+
+resource "null_resource" "write_kubeconfig" {
+  provisioner "local-exec" {
+    command = <<EOF
+echo '${local.kubeconfig}' > kubeconfig.txt
+EOF
+
+    interpreter = ["bash", "-c"]
+  }
+
+  depends_on = [aws_eks_cluster.cluster]
 }
