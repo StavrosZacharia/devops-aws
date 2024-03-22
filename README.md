@@ -363,6 +363,8 @@ This should create image version 1 under the "nginx-image" repository on ECR.
 
 ### Kubernetes
 
+The process of Docker should be automated as well, but due to time constraints and the issues with Docker I opted to execute it locally instead.
+
 1. Open your terminal and run the following command:
 
 ```bash
@@ -371,7 +373,7 @@ aws eks update-kubeconfig --region us-east-1 --name terraform-eks
 
 2. Navigate to your home directory then open the folder ".kube", if there is no file named "config", copy the downloaded file from the previous command inside. If it already is there, then disregard this step.
 
-3. Run the following commands:
+3. Navigate into the directory where you cloned the project and into "kubernetes" and run the following commands:
 
 ```bash
 kubectl apply -f .\nginx-deployment.yaml
