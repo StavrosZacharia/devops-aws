@@ -503,6 +503,7 @@ resource "aws_security_group_rule" "eks_security_group-ingress-node-https" {
 }
 
 data "aws_ami" "eks-worker" {
+  depends_on = [ aws_eks_cluster.cluster ]
   filter {
     name   = "name"
     values = ["amazon-eks-node-${aws_eks_cluster.cluster.version}-v*"]
