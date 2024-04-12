@@ -554,25 +554,25 @@ resource "aws_security_group_rule" "eks_security_group-ingress-node-https" {
 #   }
 # }
 
-# resource "aws_ecr_repository" "nginx_repository" {
-#   name = "nginx-image"
-#   image_scanning_configuration {
-#     scan_on_push = true
-#   }
-# }
+resource "aws_ecr_repository" "nginx_repository" {
+  name = "nginx-image"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
 
-# output "ecr_repository_url" {
-#   value = aws_ecr_repository.nginx_repository.repository_url
-# }
+output "ecr_repository_url" {
+  value = aws_ecr_repository.nginx_repository.repository_url
+}
 
-# resource "null_resource" "write_kubeconfig" {
-#   provisioner "local-exec" {
-#     command = <<EOF
-# echo '${local.kubeconfig}' > kubeconfig.txt
-# EOF
+resource "null_resource" "write_kubeconfig" {
+  provisioner "local-exec" {
+    command = <<EOF
+echo '${local.kubeconfig}' > kubeconfig.txt
+EOF
 
-#     interpreter = ["bash", "-c"]
-#   }
+    interpreter = ["bash", "-c"]
+  }
 
-#   depends_on = [aws_eks_cluster.cluster]
-# }
+  depends_on = [aws_eks_cluster.cluster]
+}
