@@ -502,77 +502,77 @@ resource "aws_security_group_rule" "eks_security_group-ingress-node-https" {
   type                     = "ingress"
 }
 
-data "aws_ami" "eks-worker" {
-  filter {
-    name   = "name"
-    values = ["amazon-eks-node-${aws_eks_cluster.cluster.name}-v*"]
-  }
-  most_recent = true
-  owners      = ["self"] # Amazon EKS AMI Account ID
-}
+# data "aws_ami" "eks-worker" {
+#   filter {
+#     name   = "name"
+#     values = ["amazon-eks-node-${aws_eks_cluster.cluster.name}-v*"]
+#   }
+#   most_recent = true
+#   owners      = ["self"] # Amazon EKS AMI Account ID
+# }
 
-locals {
-  worker-userdata = <<USERDATA
-#!/bin/bash
-set -o xtrace
-/etc/eks/bootstrap.sh --apiserver-endpoint '${aws_eks_cluster.cluster.endpoint}' --b64-cluster-ca '${aws_eks_cluster.cluster.certificate_authority.0.data}' '${var.cluster-name}'
-USERDATA
-}
+# locals {
+#   worker-userdata = <<USERDATA
+# #!/bin/bash
+# set -o xtrace
+# /etc/eks/bootstrap.sh --apiserver-endpoint '${aws_eks_cluster.cluster.endpoint}' --b64-cluster-ca '${aws_eks_cluster.cluster.certificate_authority.0.data}' '${var.cluster-name}'
+# USERDATA
+# }
 
-resource "aws_launch_configuration" "eks_config" {
-  associate_public_ip_address = true
-  iam_instance_profile        = aws_iam_instance_profile.worker.name
-  image_id                    = data.aws_ami.eks-worker.id
-  instance_type               = "t2.micro"
-  name_prefix                 = "terraform-eks"
-  security_groups             = ["${aws_security_group.worker.id}"]
-  user_data_base64            = base64encode(local.worker-userdata)
+# resource "aws_launch_configuration" "eks_config" {
+#   associate_public_ip_address = true
+#   iam_instance_profile        = aws_iam_instance_profile.worker.name
+#   image_id                    = data.aws_ami.eks-worker.id
+#   instance_type               = "t2.micro"
+#   name_prefix                 = "terraform-eks"
+#   security_groups             = ["${aws_security_group.worker.id}"]
+#   user_data_base64            = base64encode(local.worker-userdata)
 
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
 
-resource "aws_autoscaling_group" "eks_asg" {
-  desired_capacity     = 1
-  launch_configuration = aws_launch_configuration.eks_config.id
-  max_size             = 2
-  min_size             = 1
-  name                 = "terraform-eks"
-  vpc_zone_identifier  = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id, aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
+# resource "aws_autoscaling_group" "eks_asg" {
+#   desired_capacity     = 1
+#   launch_configuration = aws_launch_configuration.eks_config.id
+#   max_size             = 2
+#   min_size             = 1
+#   name                 = "terraform-eks"
+#   vpc_zone_identifier  = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id, aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
 
-  tag {
-    key                 = "Name"
-    value               = "terraform-eks"
-    propagate_at_launch = true
-  }
+#   tag {
+#     key                 = "Name"
+#     value               = "terraform-eks"
+#     propagate_at_launch = true
+#   }
 
-  tag {
-    key                 = "kubernetes.io/cluster/${var.cluster-name}"
-    value               = "owned"
-    propagate_at_launch = true
-  }
-}
+#   tag {
+#     key                 = "kubernetes.io/cluster/${var.cluster-name}"
+#     value               = "owned"
+#     propagate_at_launch = true
+#   }
+# }
 
-resource "aws_ecr_repository" "nginx_repository" {
-  name = "nginx-image"
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-}
+# resource "aws_ecr_repository" "nginx_repository" {
+#   name = "nginx-image"
+#   image_scanning_configuration {
+#     scan_on_push = true
+#   }
+# }
 
-output "ecr_repository_url" {
-  value = aws_ecr_repository.nginx_repository.repository_url
-}
+# output "ecr_repository_url" {
+#   value = aws_ecr_repository.nginx_repository.repository_url
+# }
 
-resource "null_resource" "write_kubeconfig" {
-  provisioner "local-exec" {
-    command = <<EOF
-echo '${local.kubeconfig}' > kubeconfig.txt
-EOF
+# resource "null_resource" "write_kubeconfig" {
+#   provisioner "local-exec" {
+#     command = <<EOF
+# echo '${local.kubeconfig}' > kubeconfig.txt
+# EOF
 
-    interpreter = ["bash", "-c"]
-  }
+#     interpreter = ["bash", "-c"]
+#   }
 
-  depends_on = [aws_eks_cluster.cluster]
-}
+#   depends_on = [aws_eks_cluster.cluster]
+# }
