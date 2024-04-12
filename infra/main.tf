@@ -506,11 +506,8 @@ data "aws_ami" "eks-worker" {
   depends_on = [ aws_eks_cluster.cluster ]
   filter {
     name   = "name"
-    values = ["amazon-eks-node-${aws_eks_cluster.cluster.version}-v*"]
+    values = ["amazon-eks-node-${aws_eks_cluster.cluster.name}-*"]
   }
-
-  most_recent = true
-  owners      = ["self"] # Amazon EKS AMI Account ID
 }
 
 locals {
