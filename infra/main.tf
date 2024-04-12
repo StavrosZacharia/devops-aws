@@ -504,19 +504,17 @@ resource "aws_security_group_rule" "eks_security_group-ingress-node-https" {
 
 data "aws_ami" "eks-worker" {
   depends_on = [ aws_eks_cluster.cluster ]
-  filter {
-    name   = "name"
-    values = ["amazon-eks-node-${aws_eks_cluster.cluster.version}-v*"]
+  name = aws_eks_cluster.cluster.name
   }
 }
 
-# locals {
-#   worker-userdata = <<USERDATA
-# #!/bin/bash
-# set -o xtrace
-# /etc/eks/bootstrap.sh --apiserver-endpoint '${aws_eks_cluster.cluster.endpoint}' --b64-cluster-ca '${aws_eks_cluster.cluster.certificate_authority.0.data}' '${var.cluster-name}'
-# USERDATA
-# }
+locals {
+  worker-userdata = <<USERDATA
+#!/bin/bash
+set -o xtrace
+/etc/eks/bootstrap.sh --apiserver-endpoint '${aws_eks_cluster.cluster.endpoint}' --b64-cluster-ca '${aws_eks_cluster.cluster.certificate_authority.0.data}' '${var.cluster-name}'
+USERDATA
+}
 
 resource "aws_launch_configuration" "eks_config" {
   associate_public_ip_address = true
@@ -525,7 +523,7 @@ resource "aws_launch_configuration" "eks_config" {
   instance_type               = "t2.micro"
   name_prefix                 = "terraform-eks"
   security_groups             = ["${aws_security_group.worker.id}"]
-  # user_data_base64            = base64encode(local.worker-userdata)
+  user_data_base64            = base64encode(local.worker-userdata)
 
   lifecycle {
     create_before_destroy = true
