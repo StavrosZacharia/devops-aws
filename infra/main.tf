@@ -503,8 +503,10 @@ resource "aws_security_group_rule" "eks_security_group-ingress-node-https" {
 }
 
 data "aws_ami" "eks-worker" {
-  name = aws_eks_cluster.cluster.name
-
+  filter {
+    name   = "name"
+    values = ["amazon-eks-node-${aws_eks_cluster.cluster.name}-v*"]
+  }
   most_recent = true
   owners      = ["self"] # Amazon EKS AMI Account ID
 }
