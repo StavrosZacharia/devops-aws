@@ -19,7 +19,7 @@ node(""){
         stage("Checkout"){
             STAGE = env.STAGE_NAME
             sh """ rm -rf *"""
-            git branch: 'master', credentialsId: '2b001878-b483-4075-b882-df99aba4f688', url: "${CHECKOUT_REPO}"
+            git branch: 'newtest', credentialsId: '2b001878-b483-4075-b882-df99aba4f688', url: "${CHECKOUT_REPO}"
         }
 
         stage("Install terraform and plan"){
